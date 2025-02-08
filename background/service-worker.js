@@ -18,7 +18,8 @@ chrome.runtime.onInstalled.addListener(async () => {
   const defaults = {
     [STORAGE_KEYS.PROXIES]: [],
     [STORAGE_KEYS.PATTERNS]: [],
-    [STORAGE_KEYS.ENABLED]: true
+    [STORAGE_KEYS.ENABLED]: true,
+    [STORAGE_KEYS.BLACKLIST_MODE]: false
   };
   
   await chrome.storage.sync.set(defaults);
@@ -145,6 +146,7 @@ async function updateProxySettings() {
 // Listen for storage changes to update proxy settings
 chrome.storage.onChanged.addListener((changes) => {
   if (changes[STORAGE_KEYS.ENABLED] || 
+      changes[STORAGE_KEYS.BLACKLIST_MODE] ||
       changes[STORAGE_KEYS.PATTERNS] || 
       changes[STORAGE_KEYS.PROXIES]) {
     updateProxySettings();
@@ -190,6 +192,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.storage.sync.get(null, (data) => {
         sendResponse({
           enabled: data[STORAGE_KEYS.ENABLED],
+          blacklistMode: data[STORAGE_KEYS.BLACKLIST_MODE],
           proxies: data[STORAGE_KEYS.PROXIES],
           patterns: data[STORAGE_KEYS.PATTERNS]
         });

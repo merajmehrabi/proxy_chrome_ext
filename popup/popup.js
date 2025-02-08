@@ -256,12 +256,13 @@ if (elements.modeToggle) {
 // State Management
 async function loadState() {
   try {
-    const response = await chrome.runtime.sendMessage({ type: 'GET_STATUS' });
+    // Get all settings from storage directly
+    const data = await chrome.storage.sync.get(null);
     currentState = {
-      enabled: response.enabled,
-      blacklistMode: response.blacklistMode || false,
-      proxies: response.proxies || [],
-      patterns: response.patterns || []
+      enabled: data[STORAGE_KEYS.ENABLED] ?? true,
+      blacklistMode: data[STORAGE_KEYS.BLACKLIST_MODE] ?? false,
+      proxies: data[STORAGE_KEYS.PROXIES] ?? [],
+      patterns: data[STORAGE_KEYS.PATTERNS] ?? []
     };
     renderUI();
   } catch (error) {
@@ -272,14 +273,18 @@ async function loadState() {
 
 async function saveState() {
   try {
+    // Save settings directly to storage
+    await chrome.storage.sync.set({
+      [STORAGE_KEYS.ENABLED]: currentState.enabled,
+      [STORAGE_KEYS.BLACKLIST_MODE]: currentState.blacklistMode,
+      [STORAGE_KEYS.PROXIES]: currentState.proxies,
+      [STORAGE_KEYS.PATTERNS]: currentState.patterns
+    });
+
+    // Notify service worker of changes
     await chrome.runtime.sendMessage({
       type: 'UPDATE_SETTINGS',
-      data: {
-        [STORAGE_KEYS.ENABLED]: currentState.enabled,
-        [STORAGE_KEYS.BLACKLIST_MODE]: currentState.blacklistMode,
-        [STORAGE_KEYS.PROXIES]: currentState.proxies,
-        [STORAGE_KEYS.PATTERNS]: currentState.patterns
-      }
+      data: currentState
     });
   } catch (error) {
     console.error('Failed to save state:', error);
