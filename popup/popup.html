@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Proxy Router</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Smart Proxy Router</h1>
+      <div class="global-controls">
+        <div class="global-toggle">
+          <label class="switch">
+            <input type="checkbox" id="enableToggle">
+            <span class="slider"></span>
+          </label>
+          <span>Enable Proxy Routing</span>
+        </div>
+        <div class="mode-toggle">
+          <label class="switch">
+            <input type="checkbox" id="modeToggle">
+            <span class="slider"></span>
+          </label>
+          <span>Blacklist Mode</span>
+          <div class="mode-info">
+            <small>Whitelist: Only matched sites use proxy</small>
+            <small>Blacklist: All sites use proxy except matched</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Proxy Management Section -->
+      <section class="section proxies">
+        <h2>Proxy Servers</h2>
+        <div class="proxy-list" id="proxyList">
+          <!-- Proxy items will be inserted here -->
+        </div>
+        <button class="add-btn" id="addProxyBtn">Add Proxy Server</button>
+
+        <!-- Add/Edit Proxy Form -->
+        <div class="modal" id="proxyModal">
+          <div class="modal-content">
+            <h3>Add Proxy Server</h3>
+            <form id="proxyForm">
+              <div class="form-group">
+                <label for="proxyName">Name:</label>
+                <input type="text" id="proxyName" required>
+              </div>
+              <div class="form-group">
+                <label for="proxyType">Type:</label>
+                <select id="proxyType" required>
+                  <option value="socks5">SOCKS5</option>
+                  <option value="http">HTTP</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="proxyHost">Host:</label>
+                <input type="text" id="proxyHost" required>
+              </div>
+              <div class="form-group">
+                <label for="proxyPort">Port:</label>
+                <input type="number" id="proxyPort" required>
+              </div>
+              <div class="form-group">
+                <label for="proxyUsername">Username (optional):</label>
+                <input type="text" id="proxyUsername">
+              </div>
+              <div class="form-group">
+                <label for="proxyPassword">Password (optional):</label>
+                <input type="password" id="proxyPassword">
+              </div>
+              <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelProxyBtn">Cancel</button>
+                <button type="submit" class="save-btn">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pattern Management Section -->
+      <section class="section patterns">
+        <h2>URL Patterns</h2>
+        <div class="pattern-list" id="patternList">
+          <!-- Pattern items will be inserted here -->
+        </div>
+        <button class="add-btn" id="addPatternBtn">Add URL Pattern</button>
+
+        <!-- Add/Edit Pattern Form -->
+        <div class="modal" id="patternModal">
+          <div class="modal-content">
+            <h3>Add URL Pattern</h3>
+            <form id="patternForm">
+              <div class="form-group">
+                <label for="patternName">Name:</label>
+                <input type="text" id="patternName" required>
+              </div>
+              <div class="form-group">
+                <label for="urlPattern">URL Pattern (regex):</label>
+                <input type="text" id="urlPattern" required>
+                <small>Example: .*\.example\.com.*</small>
+              </div>
+              <div class="form-group">
+                <label for="proxySelect">Proxy Server:</label>
+                <select id="proxySelect" required>
+                  <!-- Proxy options will be inserted here -->
+                </select>
+              </div>
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="bypassToggle">
+                  <span>Bypass Proxy (Direct Connection)</span>
+                </label>
+                <small>When enabled, matched sites will bypass the proxy</small>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelPatternBtn">Cancel</button>
+                <button type="submit" class="save-btn">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

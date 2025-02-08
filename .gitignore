@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+*.zip
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Chrome Extension specific
+*.pem
+*.crx
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Debug logs
+debug.log
+chrome-debug.log
+
+# Testing
+coverage/
+cline_docs/
