@@ -9,6 +9,7 @@ const STORAGE_KEYS = {
 // DOM Elements
 const elements = {
   enableToggle: document.getElementById('enableToggle'),
+  modeToggle: document.getElementById('modeToggle'),
   proxyList: document.getElementById('proxyList'),
   patternList: document.getElementById('patternList'),
   addProxyBtn: document.getElementById('addProxyBtn'),
@@ -19,7 +20,8 @@ const elements = {
   patternForm: document.getElementById('patternForm'),
   cancelProxyBtn: document.getElementById('cancelProxyBtn'),
   cancelPatternBtn: document.getElementById('cancelPatternBtn'),
-  proxySelect: document.getElementById('proxySelect')
+  proxySelect: document.getElementById('proxySelect'),
+  bypassToggle: document.getElementById('bypassToggle')
 };
 
 // State
@@ -130,7 +132,7 @@ function editProxy(id) {
   elements.proxyForm.proxyPassword.value = proxy.password || '';
   
   showModal(elements.proxyModal);
-};
+}
 
 async function deleteProxy(id) {
   if (!confirm('Are you sure you want to delete this proxy?')) return;
@@ -141,7 +143,7 @@ async function deleteProxy(id) {
   
   await saveState();
   renderUI();
-};
+}
 
 function editPattern(id) {
   const pattern = currentState.patterns.find(p => p.id === id);
@@ -151,9 +153,12 @@ function editPattern(id) {
   elements.patternForm.patternName.value = pattern.name;
   elements.patternForm.urlPattern.value = pattern.urlPattern;
   elements.patternForm.proxySelect.value = pattern.proxyId;
+  if (elements.bypassToggle) {
+    elements.bypassToggle.checked = pattern.bypass || false;
+  }
   
   showModal(elements.patternModal);
-};
+}
 
 async function deletePattern(id) {
   if (!confirm('Are you sure you want to delete this pattern?')) return;
@@ -161,7 +166,7 @@ async function deletePattern(id) {
   currentState.patterns = currentState.patterns.filter(p => p.id !== id);
   await saveState();
   renderUI();
-};
+}
 
 // Form Handlers
 elements.proxyForm.addEventListener('submit', async (e) => {
@@ -199,7 +204,7 @@ elements.patternForm.addEventListener('submit', async (e) => {
     name: e.target.patternName.value,
     urlPattern: e.target.urlPattern.value,
     proxyId: e.target.proxySelect.value,
-    bypass: e.target.bypassToggle.checked
+    bypass: elements.bypassToggle ? elements.bypassToggle.checked : false
   };
 
   if (editingId) {
@@ -241,10 +246,12 @@ elements.enableToggle.addEventListener('change', async (e) => {
   await saveState();
 });
 
-elements.modeToggle.addEventListener('change', async (e) => {
-  currentState.blacklistMode = e.target.checked;
-  await saveState();
-});
+if (elements.modeToggle) {
+  elements.modeToggle.addEventListener('change', async (e) => {
+    currentState.blacklistMode = e.target.checked;
+    await saveState();
+  });
+}
 
 // State Management
 async function loadState() {
@@ -252,6 +259,7 @@ async function loadState() {
     const response = await chrome.runtime.sendMessage({ type: 'GET_STATUS' });
     currentState = {
       enabled: response.enabled,
+      blacklistMode: response.blacklistMode || false,
       proxies: response.proxies || [],
       patterns: response.patterns || []
     };
@@ -268,6 +276,7 @@ async function saveState() {
       type: 'UPDATE_SETTINGS',
       data: {
         [STORAGE_KEYS.ENABLED]: currentState.enabled,
+        [STORAGE_KEYS.BLACKLIST_MODE]: currentState.blacklistMode,
         [STORAGE_KEYS.PROXIES]: currentState.proxies,
         [STORAGE_KEYS.PATTERNS]: currentState.patterns
       }
@@ -280,7 +289,9 @@ async function saveState() {
 
 function renderUI() {
   elements.enableToggle.checked = currentState.enabled;
-  elements.modeToggle.checked = currentState.blacklistMode;
+  if (elements.modeToggle) {
+    elements.modeToggle.checked = currentState.blacklistMode;
+  }
   renderProxyList();
   renderPatternList();
   updateProxySelect();
